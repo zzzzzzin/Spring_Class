@@ -132,10 +132,18 @@
 	- "Main.java" > 메인 클래스
 	- "Service.java" > 업무 클래스
 	- "Hong.java" > 기능 클래스
-	- "lee.java" > 기능 클래스(Hong을 대체할)
+	- "Lee.java"  > 기능 클래스
 	- "Worker.java"(I)
 	
-
+	
+	
+- com.test.web.controller > "Ex10Controller.java"
+- "com.test.web.service" > "BoardService.java"
+                         > "DataService.java"(I)
+                         > "MemoService.java"
+                         
+- views > "ex10.jsp"
+- 의존 주입
 
 
 
