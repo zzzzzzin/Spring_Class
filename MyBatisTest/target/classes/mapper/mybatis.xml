@@ -91,6 +91,227 @@
 			
 	</select>
 	
+	<select id="m11" resultType="dto" parameterType="String">
+		<!-- 
+		select
+			*
+		from tblAddress
+			where gender = #{gender}
+			order by seq asc 
+		-->
+		
+		<if test="gender == 'm'.toString()">
+		select
+			*
+		from tblAddress
+			where gender = 'm'
+				order by seq asc
+		</if>
+
+		<if test='gender == "f"'>
+		select
+			*
+		from tblAddress
+			where gender = 'f'
+				order by seq asc				
+		</if>
+		<if test='gender == null'>
+		select
+			*
+		from tblAddress
+				order by seq asc				
+		</if>
+		
+	</select>
+	
+	<select id="m12" resultType="dto" parameterType="String">
+		<!-- 
+		select
+			*
+		from tblAddress
+			<if test="gender != null">
+			where gender = #{gender}
+			</if>
+				order by seq asc 
+		-->				
+		
+		select
+			*
+		from tblAddress
+			where age >= 3
+			<if test="gender != null">
+			and gender = #{gender}
+			</if>
+				order by seq asc				
+		
+	</select>
+	
+	<select id="m13" resultType="dto" parameterType="dto">
+	
+		<!-- 
+		<if test="gender == null and address == null">
+		select * from tblAddress
+		</if>
+		
+		<if test="gender != null and address == null">
+		select * from tblAddress
+			where gender = #{gender}
+		</if>
+		
+		<if test="gender == null and address != null">
+		select * from tblAddress
+			where address like '%' || #{address} || '%'	
+		</if>
+		
+		<if test="gender != null and address != null">
+		select * from tblAddress
+			where gender = #{gender} and address like '%' || #{address} || '%'	
+		</if> 
+		-->
+		
+		<!--
+			java.sql.SQLSyntaxErrorException: ORA-00936: 누락된 표현식
+			 select * from tblAddress where and address like '%' || ? || '%'	 
+		-->
+		<!-- 
+		select * from tblAddress
+			where
+			 	<if test="gender != null">
+				gender = #{gender} 
+				</if>
+				
+				<if test="address != null">
+				and address like '%' || #{address} || '%'
+				</if>	
+		-->		
+		
+		select * from tblAddress
+			where
+				1 = 1
+			
+			 	<if test="gender != null">
+				and gender = #{gender} 
+				</if>
+				
+				<if test="address != null">
+				and address like '%' || #{address} || '%'
+				</if>	
+		
+	</select>
+	
+	<select id="m14" resultType="dto" parameterType="Integer">
+		select
+			<if test="type == 1">
+			name, age
+			</if>
+			<if test="type == 2">
+			name, gender, address
+			</if>
+			<if test="type == null">
+			*
+			</if>
+		from tblAddress
+	
+	</select>
+	
+	<select id="m15" resultType="dto" parameterType="map">
+	
+		<!-- 
+		select * from tblAddress
+			where ${column} = #{word} 
+		-->
+		
+		<!-- 
+		select * from tblAddress
+			<choose>
+				<when test="column == 'age'">
+				where age >= #{word}
+				</when>
+				<when test="column == 'address'">
+				where address like '%' || #{word} || '%'
+				</when>
+				<otherwise>
+				where ${column} = #{word}
+				</otherwise>
+			</choose> 
+		-->
+		
+		select * from tblAddress
+			<where>
+				<if test="column == 'age'">
+				age >= #{word}
+				</if>
+				<if test="column == 'address'">
+				address like '%' || #{word} || '%'
+				</if>
+				<if test="column != null and column != 'age' and column != 'address'">
+				${column} = #{word}
+				</if>
+			</where>	
+	</select>
+	
+	<select id="m16" parameterType="dto">
+	
+		select * from tblAddress
+			<where>
+				<if test="age != null">
+					and age >= #{age} <!-- where 절이 and/or 를 문맥에 따라 자동으로 삭제해줌 -->
+				</if>
+				<if test="gender != null">
+					and gender = #{gender}
+				</if>
+				
+			</where>
+	
+	</select>
+	
+	<update id="m17" parameterType="dto">
+			
+		update tblAddress
+			<set>
+				<if test="name != null">name = #{name},</if>
+				<if test="age != null">age = #{age},</if>
+				<if test="address != null">address = #{address},</if>
+				<if test="gender != null">gender = #{gender}</if>
+			</set>
+				where seq = #{seq}
+	
+	</update>
+	
+	<select id="m18" resultType="dto">
+		<!-- [강아지, 고양이, 타조] -->
+		
+		<!-- 
+		select * from tblAddress
+			where name = '강아지' or name = '고양이' or name = '타조' 
+		-->
+		
+		<!-- 
+		select * from tblAddress
+			where name in ('강아지', '고양이', '타조') 
+		-->
+		
+		<!-- 
+		select * from tblAddress
+			<where>
+				<foreach collection="name" item="item" index="index">
+					#{item}
+				</foreach>
+			</where>  
+		-->
+				
+		select * from tblAddress
+			<where>
+				<foreach collection="list" item="item" open="name in (" close=")" separator=",">
+					#{item}
+				</foreach>
+			</where> 
+		
+	</select>
+	
+	
+	
+	
 </mapper>
 
 
