@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.test.mybatis.dao.MyBatisDAO;
+import com.test.mybatis.dto.AddressDTO;
+import com.test.mybatis.dto.DetailDTO;
 import com.test.mybatis.dto.MyBatisDTO;
+import com.test.mybatis.dto.UserDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -340,6 +343,80 @@ public class MyBatisController {
 		
 		model.addAttribute("list", list);
 		
+		
+		return "result";
+	}
+	
+	@GetMapping("/m19.do")
+	public String m19(Model model, UserDTO udto, DetailDTO ddto) {
+		
+		//다중 쿼리 > selectKey
+		//- mapper는 한번에 한개의 SQL만 실행 가능하다.
+		
+		//- tblUser   > 회원(기본정보)
+		//- tblDetail > 회원(추가정보)
+		
+		
+		//- m19.do?name=홍길동&email=hong@test.com 
+//		dao.addUser(udto); //tblUser에 insert
+//		String seq = dao.getSeq(); //참조키 가져오기
+//		ddto.setUser_seq(seq); //가져온 참조키 tblDetail에 넘기기
+//		dao.addDetail(ddto); //tblDetail에 insert
+		
+		//자동으로 seqUser를 가져옴
+		//- m19.do?name=아무개&email=aaa@test.com 
+		//- m19.do?name=강아지&email=dog@test.com 
+		dao.addUser(udto);
+		
+		ddto.setUser_seq(udto.getSeq());
+		dao.addDetail(ddto);
+		
+		
+		//System.out.println(udto.getSeq());
+		
+	
+		return "result";
+	}
+	
+	@GetMapping("/m20.do")
+	public String m20(Model model) {
+		
+		//Join 상황
+		//- 1:1
+		
+		//AddressDTO + InfoDTO
+		//select * from tblAddress a inner join tblInfo i on a.seq = i.seq
+		
+		//1. n개의 DTO를 합한 새로운 DTO 생성 > AddressDTO + InfoDTO
+		//2. 자식을 멤버변수로 사용 > AddressDTO에 InfoDTO에 소유
+		
+		List<AddressDTO> jlist = dao.m20();
+		
+		model.addAttribute("jlist", jlist);
+		
+		return "result";
+	}
+	
+	@GetMapping("/m21.do")
+	public String m21(Model model) {
+		
+		//조인 결과 출력 > InfoDTO를 AddressDTO에 삽입하는 방법
+		List<AddressDTO> jlist = dao.m21();
+		
+		model.addAttribute("jlist", jlist);
+		
+		return "result";
+	}
+	
+	@GetMapping("/m22.do")
+	public String m22(Model model) {
+	
+		//1:N (한 사람이 여러 메모를 작성할 수 있음)
+		//tblAddress +tblMemo
+		
+		List<AddressDTO> mlist = dao.m22();
+	
+		model.addAttribute("mlist", mlist);
 		
 		return "result";
 	}

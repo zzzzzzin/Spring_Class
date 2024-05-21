@@ -309,6 +309,132 @@
 		
 	</select>
 	
+	<!-- m19.do?name=홍길동&email=hong@test.com  -->
+	<!-- 	
+	<insert id="addUser" parameterType="udto">
+		
+		insert into tblUser values (seqUser.nextVal, #{name})
+			
+	</insert>
+
+	<insert id="addDetail" parameterType="ddto">
+		
+		insert into tblDetail values (seqDetail.nextVal, #{email}, #{user_seq})
+			
+	</insert>
+	
+	
+	<select id="getSeq" resultType="String">
+		
+		select max(seq) from tblUser 
+		
+	</select>
+	 -->
+	 
+	<!-- m19.do?name=아무개&email=aaa@test.com > selectKey를 통해 seqUser를 자동으로 가져옴 > 가독성 향상 -->
+	<insert id="addUser" parameterType="udto">
+		
+		<selectKey keyProperty="seq" order="BEFORE" resultType="String">
+			select seqUser.nextVal from dual
+		</selectKey>
+		
+		insert into tblUser values (#{seq}, #{name})
+		
+	</insert>
+	
+	<insert id="addDetail" parameterType="ddto">
+	
+		insert into tblDetail values (seqDetail.nextVal, #{email}, #{user_seq})
+		
+	</insert>
+	
+	<select id="getSeq" resultType="String">
+		
+		select max(seq) from tblUser
+		
+	</select>
+	
+	<select id="m20" resultType="adto" >
+		
+		select * from tblAddress
+		
+	</select>
+	
+	<select id="m20_info" parameterType="String" resultType="idto">
+		
+		select * from tblInfo where seq = #{seq}
+		
+	</select>
+	
+	<resultMap type="idto" id="infoMap">
+		<id column="seq" property="seq"/>
+		<result column="school" property="school"/>
+		<result column="country" property="country"/>
+	</resultMap>
+	
+	<resultMap type="adto" id="addressMap">
+		<!-- 
+			컬럼 매핑
+			id: PK 용도
+				- column > 컬럼명 작성
+				- property > 컬럼의 setter명 작성
+			result: 일반 컬럼 용도
+			
+			관계 매핑
+			association: 객체 관계형 매핑(ORM) > 복잡한 객체 그래프를 쉽게 매핑
+		-->
+		<id column="seq" property="seq"/>
+		<result column="name" property="name"/>
+		<result column="age" property="age"/>
+		<result column="address" property="address"/>
+		<result column="gender" property="gender"/>
+		
+		<!-- AddressDTO에 InfoDTO를 삽입 -->
+		<association property="info" resultMap="infoMap"></association> 
+	</resultMap>
+	
+	<select id="m21" resultMap="addressMap" >
+		
+		select
+			*
+		from tblAddress a 
+			inner join tblInfo i
+				on a.seq = i.seq
+		
+	</select>
+	
+	
+	<resultMap type="mdto" id="memoMap">
+		<id column="mseq" property="seq" />
+		<result column="memo" property="memo" />
+		<result column="regdate" property="regdate" />
+		<result column="aseq" property="aseq" />
+	</resultMap>
+	
+	<resultMap type="adto" id="addressMap2">
+		<id column="seq" property="seq" />
+		<result column="name" property="name" />
+		<result column="age" property="age" />
+		<result column="address" property="address" />
+		<result column="gender" property="gender" />
+		
+		<!-- 1:N 관계에서의 삽입 > collection -->
+		<collection property="memo" resultMap="memoMap"></collection>
+	</resultMap>
+	
+	<select id="m22" resultMap="addressMap2">
+		
+		select 
+			a.*,
+			m.*,
+			m.seq as mseq
+		from tblAddress a
+			left outer join tblMemo m
+				on a.seq = m.aseq
+		
+	</select>
+	
+	
 	
 	
 	
