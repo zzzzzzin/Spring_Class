@@ -16,3 +16,4 @@ delete from tblCode;
 select * from tblCode;
 
 commit;
+

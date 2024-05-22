@@ -1,0 +1,35 @@
+//http의 header
+POST http://localhost:8080/rest/address
+Content-Type: application/json
+
+//http의 body
+{
+    "name": "vsc-rest Client",
+    "age": 20,
+    "address": "서울시 강남구",
+    "gender": "m"
+
+}
+
+###
+
+
+GET http://localhost:8080/rest/address HTTP/1.1
+
+
+###
+PUT http://localhost:8080/rest/address/1 HTTP/1.1
+Content-Type: application/json
+
+{
+    "name": "강아지",
+    "age": 100,
+    "address": "서울시 강동구",
+    "gender": "m"
+}
+
+###
+DELETE http://localhost:8080/rest/address/24 HTTP/1.1
+
+###
+GET http://localhost:8080/rest/address/1 HTTP/1.1
