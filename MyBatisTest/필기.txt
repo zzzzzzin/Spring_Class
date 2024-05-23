@@ -126,10 +126,10 @@ MyBatis(iBatis)
 
 MyBatis를 스프링에 적용하는 방법
 1. XML 매퍼를 사용하는 방법
-	- 오늘
+	- MyBatistTest
 
 2. 인터페이스 매퍼를 사용하는 방법
-	- 다음주
+	- MyBatistSimpleTest
 
 
 
