@@ -13,11 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 import com.test.rest.dao.AddressDAO;
 import com.test.rest.dto.AddressDTO;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 
 //@Controller
 @RestController
 @RequiredArgsConstructor
+@Api(value = "주소 컨트롤러", description = "주소 데이터 REST API Controller")
 public class AddressController {
 
 	private final AddressDAO dao;
@@ -47,9 +51,9 @@ public class AddressController {
 	//2. POST
 	//3. return int
 	
-	
+	@ApiOperation(value = "추가하기", notes = "주소록 데이터를 추가합니다.")
 	@PostMapping("/address") //405에러 > form태그에서 데이터를 보내줘야 함
-	public int add(@RequestBody AddressDTO dto) {
+	public int add(@ApiParam(value = "주소록 데이터", required = true) @RequestBody AddressDTO dto) {
 	
 		int result = dao.add(dto);
 		
