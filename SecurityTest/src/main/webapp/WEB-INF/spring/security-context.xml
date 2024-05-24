@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- security-context.xml -->
+	
+	<!-- 접근 권한 페이지 처리 방법 > 2번 > ref에 bean의 id를 적어야함 > CustomAccessDeniedHanlder를 bean으로 만들어야함 -->
+	<bean id="customAccessDenied" class="com.test.security.auth.CustomAccessDeniedHanlder"></bean>
+	
+	<!-- 로그인 성공 처리 핸들러 -->
+	<bean id="customLoginSuccess" class="com.test.security.auth.CustomLoginSuccessHandler"></bean>
+	
+	<!-- 커스텀 PasswordEncoder -->
+	<!-- <bean id="customNoOpPasswordEncoder" class="com.test.security.auth.CustomNoOpPasswordEncoder"></bean> -->
+	
+	<!-- PasswordEncoder : blowfish -->
+	<bean id="bcryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></bean>
+	
+	<!-- CustomUserDetailsService 커스텀 유저 정보 객체 -->
+	<bean id="customUserDetailsService" class="com.test.security.auth.CustomUserDetailsService"></bean>
+
+	<!-- 16.기본 설정 	
+	<security:http>
+		<security:form-login/>
+	</security:http>
+	 -->
+	 <!-- 20.로그인, 로그아웃 + 인증(허가 관련 설정) 
+	 	  petmitAll > 아무나
+	 	  hasRole('ROLE_권한명') > "권한명"에 해당하는 사람만 pattern의 url에 접근 가능
+	 -->
+	 <!--  
+	 <security:http>
+	 	<security:intercept-url pattern="/index.do" access="permitAll"/>
+	 	<security:intercept-url pattern="/member.do" access="hasRole('ROLE_MEMBER')"/> ROLE_권한명(ROLE은 예약어)
+		<security:form-login/>
+	</security:http>
+	 --> 
+	<!-- 21. 단순 로그인 처리 (인증 관련 설정) --> 
+	 <!-- 
+	 <security:http>
+	 	<security:intercept-url pattern="/index.do" access="permitAll"/> 
+	 	<security:intercept-url pattern="/member.do" access="hasRole('ROLE_MEMBER')"/> 
+	 	<security:intercept-url pattern="/admin.do" access="hasRole('ROLE_ADMIN')"/> 
+		<security:form-login/>
+	</security:http>
+	 --> 
+
+	<!-- 23. 접근 권한 페이지 처리 -->
+	 <security:http>
+	 
+	 	<!-- URI 허가 -->
+	 	<security:intercept-url pattern="/index.do" access="permitAll"/> 
+	 	<security:intercept-url pattern="/member.do" access="hasRole('ROLE_MEMBER')"/> 
+	 	<security:intercept-url pattern="/admin.do" access="hasRole('ROLE_ADMIN')"/>
+	 	
+	 	<!-- 23. 403 처리 -->
+	 	<!-- 접근 권한 페이지 처리 방법 > 1번(access-denied-handler에 uri지정) -->
+		<!-- <security:access-denied-handler error-page="/accesserror.do" /> --> 
+	 	
+	 	<!-- 접근 권한 페이지 처리 방법 > 2번(AccessDeniedHandler 직접 구현)  > CustomAccessDenied.java에서 구현 -->
+	 	<security:access-denied-handler ref="customAccessDenied" />
+	 	
+	 	<!-- 폼인증 > 기본 --> 
+		<!-- <security:form-login/> -->
+		
+		<!-- 24. 커스텀 로그인 페이지 -->
+		<!-- <security:form-login login-page="/customlogin.do"/> -->
+		
+		<!-- 25. 로그인 후의 커스텀 성공 핸들러-->
+		<security:form-login login-page="/customlogin.do" authentication-success-handler-ref="customLoginSuccess"/>
+		
+		<!-- 26. 로그아웃 -->
+		<!-- logout-url="/customlogout.do" > 작성된 주소를 post로 자동 매핑 -->
+		<security:logout logout-url="/customlogout.do" invalidate-session="true" logout-success-url="/index.do" /> 
+		
+	</security:http>
+	<!-- 16. 기본 설정
+	<security:authentication-manager>
+	</security:authentication-manager>
+	 -->		 
+	
+	<!-- 21. 단순 로그인 처리(인증 관련 설정) -->
+	
+	<security:authentication-manager>
+		<!-- 
+		<security:authentication-provider>
+		
+			InMemory 방식  
+			<security:user-service>
+				계정(사용자) > 이름/비밀번호/권한명
+				<security:user name="hong" password="1111" authorities="ROLE_MEMBER"/> id가 hong인 회원은 member권한을 지님
+				
+				{noop} > PasswordEncoder를 무시하게 해줌
+				<security:user name="hong" password="{noop}1111" authorities="ROLE_MEMBER"/> id가 hong인 회원은 member권한을 지님
+				
+				관리자 > admin페이지만 들어가고 member페이지는 못들어감
+				<security:user name="admin" password="{noop}1111" authorities="ROLE_ADMIN"/>
+				
+				admin페이지에 접근가능한 사람이 member페이지에 접근 가능하도록 하는 방법 > admin에 member페이지 접근 권한 추가 
+				<security:user name="admin" password="{noop}1111" authorities="ROLE_MEMBER, ROLE_ADMIN"/> 
+				
+			</security:user-service>
+			
+			 
+			 JDBC 방식
+			 <security:jdbc-user-service data-source-ref="dataSource" />
+			 
+			 PasswordEncoding하면서 작성
+			 <security:jdbc-user-service
+	data-source-ref="dataSource"
+	users-by-username-query="select memberid as username, memberpw as password, enabled from member where memberid = ?"
+	authorities-by-username-query="select memberid as username, auth as authority from member_auth where memberid = ?" />
+			 
+			커스텀 PasswordEncoder
+			<security:password-encoder ref="customNoOpPasswordEncoder"/>
+			
+			
+			<security:password-encoder ref="bcryptPasswordEncoder" />
+			
+			
+		</security:authentication-provider>
+		 -->
+		 
+		 <!-- 33. UserDetailsService > 커스텀 -->
+		 <security:authentication-provider user-service-ref="customUserDetailsService">
+			<security:password-encoder ref="bcryptPasswordEncoder" />
+		</security:authentication-provider>
+		
+	</security:authentication-manager>
+
+</beans>
+
+
+
+
+
+
+
+
+
+
